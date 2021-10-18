@@ -10,23 +10,20 @@ Please install all the dependencies by running:
 pip install -r requirements.txt
 ```
 
+To get the list of all available arguments - type:
+```python
+python server.py -h
+
+python client.py -h
+```
+
 ### To start server / client:
 <hr/>
 
-#### Windows
 ```python
-py server.py
-```
-```python
-py client.py
-```
-#### Linux
-```python
-python3 server.py
-```
-```python
-python3 server.py
-```
+python server.py
 
+python client.py
+```
 
 <hr/>
