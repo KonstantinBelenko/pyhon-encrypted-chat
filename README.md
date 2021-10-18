@@ -17,7 +17,7 @@ python server.py -h
 python client.py -h
 ```
 
-### To start server / client:
+### To start server | client /w default settings:
 <hr/>
 
 ```python
