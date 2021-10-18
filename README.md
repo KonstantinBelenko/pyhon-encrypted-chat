@@ -13,17 +13,11 @@ pip install -r requirements.txt
 To get the list of all available arguments - type:
 ```python
 python server.py -h
-
 python client.py -h
 ```
 
 ### To start server | client with default settings:
-<hr/>
-
 ```python
 python server.py
-
 python client.py
 ```
-
-<hr/>
