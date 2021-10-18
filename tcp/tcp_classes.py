@@ -20,7 +20,7 @@ class Server:
 
     '''
 
-    def __init__(self, IP, PORT, BUFFER_SIZE=1024, HEADER_SIZE=50, encoding='utf-8'):
+    def __init__(self, IP:str, PORT:int, BUFFER_SIZE:int = 1024, HEADER_SIZE:int = 50, encoding:str = 'utf-8') -> None:
         '''
         Parameters
         ----------
@@ -45,16 +45,23 @@ class Server:
         self.clients = {}
         self.socket = s.socket(s.AF_INET, s.SOCK_STREAM)
 
-    def listen(self, num_clients:int):
+    def listen(self, num_clients:int, verbose:bool = False) -> None:
         '''Binds the server and starts listenting for the specified number of clients.
         
         Parameters
         ----------
         num_clients : int
-            The number of clients to listen for.
+            The number of clients to listen for
+        verbose : bool
+            Displays server information (default is False)
         '''
         self.socket.bind((self.IP, self.PORT))
         self.socket.listen(num_clients)
+        if verbose:
+            print('~~~ Server has started ~~~')
+            print(f"IP: {self.IP} \nPORT: {self.PORT} \nMAX-QUEUE: {num_clients} \nBUFFER-SIZE: {self.BUFFER_SIZE} \nENCODING: {self.encoding}")
+            print('~~~~~~~ Listening ~~~~~~~')
+
 
     def accept(self) -> int:
         '''Returns an ID of an accepted client.'''
@@ -80,7 +87,7 @@ class Server:
             print(self.clients)
         return self.clients
 
-    def get_client_ip(self, client_id):
+    def get_client_ip(self, client_id) -> str:
         '''Returns a client ip address by his id in the `clients` dictionary
 
         Parameters
@@ -91,7 +98,7 @@ class Server:
         '''
         return self.clients[client_id].getpeername()[0]
 
-    def send(self, message:str, client_id:int):
+    def send(self, message:str, client_id:int) -> None:
         '''Sends a message to a client by the specified client ID.
         
         Parameters
@@ -106,7 +113,7 @@ class Server:
             .encode(self.encoding)
             )
 
-    def send_all(self, message:str, ignore_client:int = None):
+    def send_all(self, message:str, ignore_client:int = None) -> None:
         '''Sends specified message to all clients.
 
         If the argument `ignore_client` is passed in, specified client will be ignored when sending the message.
@@ -139,7 +146,7 @@ class Server:
         '''
         return recv(self.clients[client_id], self.HEADER_SIZE, self.BUFFER_SIZE)
 
-    def close(self):   
+    def close(self) -> None:
         '''Closes server socket'''
         self.socket.close()
 
@@ -164,7 +171,7 @@ class Client:
 
     '''
 
-    def __init__(self, IP, PORT, BUFFER_SIZE=1024, HEADER_SIZE=50, encoding='utf-8'):
+    def __init__(self, IP, PORT, BUFFER_SIZE=1024, HEADER_SIZE=50, encoding='utf-8', verbose:bool = False) -> None:
         '''
         Parameters
         ----------
@@ -178,6 +185,8 @@ class Client:
             Default size of a header message containing information that will come before any message is sent (default is 50)
         encoding : str
             Charset that all the messages will be encoded in (default is utf-8)
+        verbose : bool
+            Displays client information (default is False)
         '''
         self.IP = IP
         self.PORT = PORT
@@ -187,11 +196,16 @@ class Client:
     
         self.socket = s.socket(s.AF_INET, s.SOCK_STREAM)
 
-    def connect(self):
+        if verbose:
+            print('~~~ Client information ~~~')
+            print(f"IP: {self.IP} \nPORT: {self.PORT} \nBUFFER-SIZE: {self.BUFFER_SIZE} \nENCODING: {self.encoding}")
+            print('~~~~~~~ Connecting ~~~~~~~')
+
+    def connect(self) -> None:
         '''Connects to the specified earlier IP and PORT'''
         self.socket.connect((self.IP, self.PORT))
 
-    def send(self, message:str):
+    def send(self, message:str) -> None:
         ''' Sends the specified message to the server.
         Parameters
         ----------
@@ -202,7 +216,7 @@ class Client:
             header_the_message(message, self.HEADER_SIZE).encode(self.encoding)
             )
 
-    def close(self):
+    def close(self) -> None:
         '''Closes the client socket'''
         self.socket.close()
 
