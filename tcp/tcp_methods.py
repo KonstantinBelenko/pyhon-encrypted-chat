@@ -1,11 +1,17 @@
+from Crypto.Cipher import PKCS1_OAEP
+import ast
+
+def caclulate_space(HEADER_SIZE:int, message_length:int) -> str:
+    return ' ' * (HEADER_SIZE - len(str(message_length)))
+
+
+def split_message(message: str, split_size: int) -> list:
+    return [message[i:i+split_size] for i in range(0, len(message), split_size)]
+    
+
+
 def header_the_message(message:str, HEADER_SIZE:int = 50) -> str:
     '''Makes header with information about the message
-
-    ...
-
-    Format
-    ------
-    h{message_length}>{space_leftout}{message}
 
     Parameters
     ----------
@@ -15,14 +21,14 @@ def header_the_message(message:str, HEADER_SIZE:int = 50) -> str:
         Default size of a header message containing information that will come before any message is sent (default is 50)
     '''
 
-    # This considers the space marking symbols ['h', '>'] take in the header  
-    HEADER_SIZE -= 2
-    message_length = len(message)
-    space_leftout = ' ' * (HEADER_SIZE - len(str(message_length)))
+    message_length = len(str(message))
+    space_leftout = caclulate_space(HEADER_SIZE, message_length)
 
-    return f"h{message_length}>{space_leftout}{message}"
+    return f"{message_length}{space_leftout}{message}"
 
-def recv(client, HEADER_SIZE:int = 50, BUFFER_SIZE:int = 1024, encoding:str = 'utf-8') -> str:
+
+
+def recv(client, HEADER_SIZE: int=50, BUFFER_SIZE: int=1024, encoding: str='utf-8', decryptor=None) -> str:
     '''Decodes the header and receives the full message that was sent.
     
     Parameters
@@ -35,21 +41,27 @@ def recv(client, HEADER_SIZE:int = 50, BUFFER_SIZE:int = 1024, encoding:str = 'u
             Default buffer size that the server will use when i/o requests (default is 1024)
     encoding : str
         Charset that all the messages will be encoded in (default is utf-8)
+    decryptor
+        Decryps the message if the decryptor is provided
     '''
-    header = client.recv(HEADER_SIZE).decode(encoding)
-    message_length = int(header[1:header.find('>')])
-    final_message = ''
 
-    if message_length < BUFFER_SIZE:
-        final_message += client.recv(message_length).decode(encoding)
+    incoming_message_length = int(client.recv(HEADER_SIZE).decode(encoding))
+    final_message = ""
+
+    if incoming_message_length < BUFFER_SIZE:
+        final_message += client.recv(incoming_message_length).decode(encoding)
+
     else:
-        times_to_loop = times_to_loop
+        times_to_recv_buffer = (incoming_message_length // BUFFER_SIZE)
 
-        # Repeat until everything has been received
-        for i in range(times_to_loop):
+        for i in range(times_to_recv_buffer):
             final_message += client.recv(BUFFER_SIZE).decode(encoding)
         
-        last_message_length = message_length - BUFFER_SIZE * (times_to_loop)
+        last_message_length = incoming_message_length - BUFFER_SIZE * (times_to_recv_buffer)
         final_message += client.recv(last_message_length).decode(encoding)
+
+    if decryptor:
+        final_message = ast.literal_eval(final_message)
+        final_message = decryptor.decrypt(final_message).decode(encoding)
 
     return final_message
