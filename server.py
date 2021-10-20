@@ -6,10 +6,9 @@ ap.add_argument("-a", "--ip-address",   required=False, help="Ip address of the 
 ap.add_argument("-p", "--port",         required=False, help="Port address of the server",         type=int,    default=5000)
 ap.add_argument("-q", "--max-querry",   required=False, help="Number of maximum connection queue", type=int,    default=5)
 ap.add_argument("-b", "--buffer-size",  required=False, help="Default server buffer size",         type=int,    default=1024)
-ap.add_argument("-e", "--encoding",     required=False, help="Default encoding",                   type=str,    default='utf-8')
 
 ap.add_argument("-v", "--verbose",      required=False, help="Verbose on / off",        action='store_true')
-ap.add_argument("-c", "--encryption",   required=False, help="Use encryption or not",   action='store_true')
+ap.add_argument("-e", "--encryption",   required=False, help="Use encryption or not",   action='store_true')
 
 args = vars(ap.parse_args())
 
@@ -35,7 +34,6 @@ if __name__ == "__main__":
         args['ip_address'], 
         args['port'], 
         args['buffer_size'], 
-        encoding=args['encoding'],
         verbose=args['verbose'],
         encryption=args['encryption']
     )
