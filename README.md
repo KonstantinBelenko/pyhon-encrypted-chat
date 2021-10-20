@@ -1,4 +1,5 @@
 # 🐍💬 pyhon-encrypted-chat
+#### [python 3.8.5]
 Python socket Server-Client application capable of handling multiple connections and **Asymmetric Encryption** of data streams. <br/>
 This chat consists of two files and a tcp-socket communication library that I wrote.
 
