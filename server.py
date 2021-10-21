@@ -17,10 +17,22 @@ args = vars(ap.parse_args())
 def send_all(client_id):
     while True:
         message     =   server.recv(client_id)
-        client_name =   server.get_client_ip(client_id)
-        broadcast = f'{client_name}: {message}'
 
-        print(broadcast)
+        if not message:
+
+            client_name =   server.get_client_ip(client_id)
+            broadcast = f'{client_name}: {"Has disconnected"}'
+
+            server.send_all(
+                message          = broadcast, 
+                ignore_client_id = client_id
+            )
+
+            del server.clients[client_id]
+            break
+
+        client_name = server.get_client_ip(client_id)
+        broadcast   = f'{client_name}: {message}'
 
         server.send_all(
             message          = broadcast, 
@@ -46,7 +58,11 @@ if __name__ == "__main__":
         client_id = server.accept()
         client_name = server.get_client_ip(client_id)
 
-        print(f"Client: {client_name} has connected")
+        # Broadcast connction to other clients
+        server.send_all(
+            message          = f'{client_name}: {"Has connected"}', 
+            ignore_client_id = client_id
+        )
 
         # Create new therad for each client to broadcast messages across all connections
         thread = threading.Thread(target=send_all, args=(client_id,)).start()

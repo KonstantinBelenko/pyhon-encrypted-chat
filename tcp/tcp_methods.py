@@ -31,6 +31,8 @@ def header_the_message(message:str, HEADER_SIZE:int = 50) -> str:
 def recv(client, HEADER_SIZE: int=50, BUFFER_SIZE: int=1024, encoding: str='utf-8', decryptor=None) -> str:
     '''Decodes the header and receives the full message that was sent.
     
+    Will return None if the connection is closed.
+
     Parameters
     ----------
     client : socket.socket
@@ -45,23 +47,30 @@ def recv(client, HEADER_SIZE: int=50, BUFFER_SIZE: int=1024, encoding: str='utf-
         Decryps the message if the decryptor is provided
     '''
 
-    incoming_message_length = int(client.recv(HEADER_SIZE).decode(encoding))
-    final_message = ""
+    try:
 
-    if incoming_message_length < BUFFER_SIZE:
-        final_message += client.recv(incoming_message_length).decode(encoding)
+        header_message = client.recv(HEADER_SIZE)
 
-    else:
-        times_to_recv_buffer = (incoming_message_length // BUFFER_SIZE)
+        incoming_message_length = int(header_message.decode(encoding))
+        final_message = ""
 
-        for i in range(times_to_recv_buffer):
-            final_message += client.recv(BUFFER_SIZE).decode(encoding)
-        
-        last_message_length = incoming_message_length - BUFFER_SIZE * (times_to_recv_buffer)
-        final_message += client.recv(last_message_length).decode(encoding)
+        if incoming_message_length < BUFFER_SIZE:
+            final_message += client.recv(incoming_message_length).decode(encoding)
 
-    if decryptor:
-        final_message = ast.literal_eval(final_message)
-        final_message = decryptor.decrypt(final_message).decode(encoding)
+        else:
+            times_to_recv_buffer = (incoming_message_length // BUFFER_SIZE)
 
-    return final_message
+            for i in range(times_to_recv_buffer):
+                final_message += client.recv(BUFFER_SIZE).decode(encoding)
+            
+            last_message_length = incoming_message_length - BUFFER_SIZE * (times_to_recv_buffer)
+            final_message += client.recv(last_message_length).decode(encoding)
+
+        if decryptor:
+            final_message = ast.literal_eval(final_message)
+            final_message = decryptor.decrypt(final_message).decode(encoding)
+
+        return final_message
+
+    except ConnectionResetError as e:
+        return None
