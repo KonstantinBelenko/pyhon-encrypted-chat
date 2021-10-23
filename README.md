@@ -17,8 +17,8 @@ python client.py --help
 
 #### 🏃‍♂ To start server / client:
 ```python
-python server.py -a <IP> -p <PORT> --verbose --encryption
-python client.py -a <IP> -p <PORT> --verbose --encryption
+python server.py -a <IP> -p <PORT> --verbose
+python client.py -a <IP> -p <PORT> --verbose
 ```
 
 ## Argumets:
@@ -29,16 +29,9 @@ If run without options - defaults will be used.
 <pre>
 -a  --ip-address   default = 127.0.0.1
 -p  --port         default = 5000     
--b  --buffer-size  default = 1024   
 </pre>
 
 #### 🚩 Flags [server | client]:
 <pre>
--e  --encryption   default = No    
--v  --verbose      default = No     
-</pre>
-
-#### 👓 Server specific options:
-<pre>
--q  --max-querry   default = 5     
+-v  --verbose      default = True     
 </pre>
